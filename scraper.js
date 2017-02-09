@@ -15,16 +15,17 @@ const dataFields = ['title', 'price', 'imageURL', 'url', 'time'];
 const dataFieldNames = ['Title', 'Price', 'ImageURL', 'URL', 'Time'];
 
 // Check if data directory exists
-fs.stat('./data/', function (error) {
-    if (error) {
-        fs.mkdir('./data');
-    }
-});
+function checkDirectory(dir) {
+    fs.stat(dir, function (error) {
+        if (error) {
+            fs.mkdir(dir);
+        }
+    });
+}
 
 request(mainUrl, (error, response, body) => {
     if (error || response.statusCode !== 200) {
-        // TODO: Log error
-        return;
+        return handleError(error, 'Unable to connect to http://shirts4mike.com');
     }
 
     const $mainHtml = cheerio.load(body);
@@ -38,7 +39,7 @@ request(mainUrl, (error, response, body) => {
         request(productLink, (error, response, productBody) => {
             if (error || response.statusCode !== 200) {
                 // TODO: Log error
-                return;
+                return handleError(error, 'Unable to load shirt\'s page.');
             }
 
             const $productHtml = cheerio.load(productBody);
@@ -71,12 +72,25 @@ function writeToCSV () {
         fieldNames: dataFieldNames
     });
 
+    checkDirectory('./data/');
+
     fs.writeFile(`./data/${moment().format("YYYY-MM-DD")}.csv`, csv, (error) => {
         if (error) {
-            // TODO: Handle error
-            return;
+            return handleError(error, `Unable to write to file ./data/${moment().format("YYYY-MM-DD")}.csv)`);
         }
 
         console.log('File saved');
+    });
+}
+
+function handleError (error, customMessage) {
+    const timestamp = new Date();
+    const fullErrorMessage = `[${timestamp}] (${error.errorCode}) ${customMessage}`;
+
+    console.log(fullErrorMessage);
+
+    checkDirectory('./log/');
+
+    fs.appendFile('./log/scraper-error.log', fullErrorMessage + ' \n', (error) => {
     });
 }
