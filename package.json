@@ -1,0 +1,20 @@
+{
+  "name": "tt-content-scraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "scraper.js",
+  "scripts": {
+    "start": "node scraper.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/firstnecron/tt-content-scraper/"
+  },
+  "author": "Justin Russo",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^0.22.0",
+    "json2csv": "^3.7.3",
+    "request": "^2.79.0"
+  }
+}
